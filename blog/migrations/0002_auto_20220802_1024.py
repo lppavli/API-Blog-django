@@ -9,31 +9,59 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('blog', '0001_initial'),
+        ("blog", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='post',
-            name='author',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='posts', to=settings.AUTH_USER_MODEL, verbose_name='author'),
+            model_name="post",
+            name="author",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="posts",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="author",
+            ),
         ),
         migrations.CreateModel(
-            name='Subscribe',
+            name="Subscribe",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('post', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='blog.post')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "post",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="blog.post"
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'subscribe',
-                'verbose_name_plural': 'subscribe',
-                'db_table': 'subscribe',
+                "verbose_name": "subscribe",
+                "verbose_name_plural": "subscribe",
+                "db_table": "subscribe",
             },
         ),
         migrations.AddField(
-            model_name='post',
-            name='subscribes',
-            field=models.ManyToManyField(through='blog.Subscribe', to=settings.AUTH_USER_MODEL, verbose_name='subscribe'),
+            model_name="post",
+            name="subscribes",
+            field=models.ManyToManyField(
+                through="blog.Subscribe",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="subscribe",
+            ),
         ),
     ]

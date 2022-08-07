@@ -1,12 +1,20 @@
-from django.urls import path, include
-from rest_framework import routers
+from django.urls import path
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from blog.api.v1.views import UserViewSet, PostViewSet
+from blog.api.v1.post_views import *
 
-router = routers.DefaultRouter()
-router.register(r"users", UserViewSet)
-router.register(r"posts", PostViewSet)
+from blog.api.v1.user_views import CreateUserView, UserListView
 
 urlpatterns = [
-    path('', include(router.urls))
+    path("posts/", PostListView.as_view()),
+    path("posts/<int:pk>/", PostDetailView.as_view()),
+    path("posts/create/", PostCreateView.as_view()),
+    path("posts/new/", PostNewListView.as_view()),
+    path("follows/", FollowListView.as_view()),
+    path("follows/create/", FollowCreateView.as_view()),
+    path("follows/<int:pk>/", FollowDestroyView.as_view()),
+    path("login/", TokenObtainPairView.as_view(), name="token_obbtain_pair"),
+    path("token/refresh", TokenRefreshView.as_view(), name="token_refresh"),
+    path("signup/", CreateUserView.as_view()),
+    path("users/", UserListView.as_view()),
 ]

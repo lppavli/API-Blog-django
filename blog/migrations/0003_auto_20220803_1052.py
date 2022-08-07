@@ -9,32 +9,58 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('blog', '0002_auto_20220802_1024'),
+        ("blog", "0002_auto_20220802_1024"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Follow',
+            name="Follow",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='folowing', to=settings.AUTH_USER_MODEL)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='folower', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "author",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="folowing",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="folower",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'subscribe',
-                'verbose_name_plural': 'subscribe',
-                'db_table': 'folow',
+                "verbose_name": "subscribe",
+                "verbose_name_plural": "subscribe",
+                "db_table": "folow",
             },
         ),
         migrations.AlterModelOptions(
-            name='post',
-            options={'ordering': ['-created_at'], 'verbose_name': 'Post', 'verbose_name_plural': 'Posts'},
+            name="post",
+            options={
+                "ordering": ["-created_at"],
+                "verbose_name": "Post",
+                "verbose_name_plural": "Posts",
+            },
         ),
         migrations.RemoveField(
-            model_name='post',
-            name='subscribes',
+            model_name="post",
+            name="subscribes",
         ),
         migrations.DeleteModel(
-            name='Subscribe',
+            name="Subscribe",
         ),
     ]
