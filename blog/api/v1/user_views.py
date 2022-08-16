@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.db.models import Count
 from rest_framework import generics
 
@@ -23,6 +24,9 @@ class UserListView(generics.ListAPIView):
 
     serializer_class = UserListSerializer
 
-    queryset = User.objects.annotate(posts_count=Count("posts")).order_by(
-        "-posts_count"
-    )
+    def get_queryset(self):
+        users = cache.get('posts')
+        if not users:
+            users = User.objects.annotate(posts_count=Count("posts")).order_by("-posts_count")
+            cache.set('users', users)
+        return users

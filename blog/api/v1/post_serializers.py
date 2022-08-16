@@ -32,4 +32,12 @@ class FollowSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Follow
+        fields = ["id", "user", "author"]
+
+
+class FollowCreateSerializer(serializers.ModelSerializer):
+    """Подписка на другого пользователя"""
+
+    class Meta:
+        model = Follow
         fields = ["id", "author"]

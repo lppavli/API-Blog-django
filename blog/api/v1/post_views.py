@@ -1,15 +1,20 @@
+from django.core.cache import cache
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, generics
+from rest_framework import generics
 
 from django.db.models import Q
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
+from config import settings
+
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 from blog.api.v1.permissions import IsAuthorOrReadOnly
 from blog.api.v1.post_serializers import (
     FollowSerializer,
     PostListSerializer,
     PostDetailSerializer,
-    PostCreateSerializer,
+    PostCreateSerializer, FollowCreateSerializer,
 )
 from blog.models import Post, Follow
 
@@ -20,7 +25,13 @@ class PostListView(generics.ListAPIView):
     serializer_class = PostListSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ["author__username"]
-    queryset = Post.objects.all().order_by("-created_at")
+
+    def get_queryset(self):
+        posts = cache.get('posts')
+        if not posts:
+            posts = Post.objects.all().order_by("-created_at")
+            cache.set('posts', posts)
+        return posts
 
 
 class PostNewListView(generics.ListAPIView):
@@ -31,8 +42,11 @@ class PostNewListView(generics.ListAPIView):
     filterset_fields = ["author__username"]
 
     def get_queryset(self):
-        queryset = Post.objects.filter(~Q(read_users=self.request.user))
-        return queryset
+        posts = cache.get('posts_new')
+        if not posts:
+            posts = Post.objects.filter(~Q(read_users=self.request.user))
+            cache.set('posts_new', posts)
+        return posts
 
 
 class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -62,13 +76,19 @@ class FollowListView(generics.ListAPIView):
     serializer_class = FollowSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ["user__username"]
-    queryset = Follow.objects.all()
+
+    def get_queryset(self):
+        follows = cache.get('follows')
+        if not follows:
+            follows = Follow.objects.all()
+            cache.set('follows', follows)
+        return follows
 
 
 class FollowCreateView(generics.CreateAPIView):
     """Создание подписки"""
 
-    serializer_class = FollowSerializer
+    serializer_class = FollowCreateSerializer
     queryset = Follow.objects.filter()
 
     def perform_create(self, serializer):
@@ -80,11 +100,3 @@ class FollowDestroyView(generics.DestroyAPIView):
 
     serializer_class = FollowSerializer
     queryset = Follow.objects.filter()
-
-
-class FollowViewSet(viewsets.ModelViewSet):
-    serializer_class = FollowSerializer
-
-    def get_queryset(self):
-        queryset = Follow.objects.filter(user=self.request.user)
-        return queryset
